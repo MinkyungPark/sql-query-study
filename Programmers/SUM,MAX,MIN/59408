@@ -1,0 +1,6 @@
+ANIMAL_INS 테이블에서
+동물의 이름 갯수 조회,
+이름이 null이 아니고 중복되는 이름은 집계하지 않음
+
+SELECT COUNT(DISTINCT NAME) FROM ANIMAL_INS
+WHERE NAME IS NOT NULL;

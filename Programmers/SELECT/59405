@@ -1,0 +1,6 @@
+ANIMAL_INS 테이블에서
+가장 먼저 들어온 동물의 이름 1개 출력
+(상위 n개 레코드 문제)
+
+SELECT NAME FROM ANIMAL_INS
+ORDER BY DATETIME LIMIT 1;

@@ -1,0 +1,8 @@
+입양을 보낸기록은 있는데 보호소에 들어온 기록이
+없는 동물의 아이디와 이름 조회
+
+
+select ANIMAL_ID, NAME
+from ANIMAL_OUTS
+where ANIMAL_ID not in (
+    select ANIMAL_ID from ANIMAL_INS)

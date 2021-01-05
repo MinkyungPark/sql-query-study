@@ -1,0 +1,124 @@
+
+NAME	TYPE	NULLABLE
+ANIMAL_ID	VARCHAR(N)	FALSE
+ANIMAL_TYPE	VARCHAR(N)	FALSE
+DATETIME	DATETIME	FALSE
+NAME	VARCHAR(N)	TRUE
+SEX_UPON_OUTCOME	VARCHAR(N)	FALSE
+보호소에서는 몇 시에 입양이 가장 활발하게 일어나는지 알아보려 합니다. 0시부터 23시까지, 각 시간대별로 입양이 몇 건이나 발생했는지 조회하는 SQL문을 작성해주세요. 이때 결과는 시간대 순으로 정렬해야 합니다.
+
+예시
+SQL문을 실행하면 다음과 같이 나와야 합니다.
+
+HOUR	COUNT
+0	0
+1	0
+2	0
+3	0
+4	0
+5	0
+6	0
+7	3
+8	1
+9	1
+10	2
+11	13
+12	10
+13	14
+14	9
+15	7
+16	10
+17	12
+18	16
+19	2
+20	0
+21	0
+22	0
+23	0
+
+여기서 문제는 0인 컬럼(테이블에 없는 값)을 만들어주는 것...
+
+=========
+1. 단계
+이미존재하는 ANIMAL_OUTS 테이블을 24행까지 불러온 후,
+행 번호가 출력되도록 함.
+=========
+set @rownum = -1;
+select (@rownum := @rownum + 1) as 'HOUR'
+from animal_outs
+where @rownum < 23
+// 또는
+set @rownum = -1;
+select (@rownum := @rownum + 1) as 'HOUR'
+from animal_outs
+limit 24
+
+HOUR
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+
+=========
+2. 단계
+=========
+select hour(datetime) as hour, count(*) as count
+from animal_outs
+group by hour
+
+
+=========
+3. 단계
+=========
+set @rownum:=-1; 
+WITH H as (SELECT @rownum:=@rownum+1 as HOUR 
+            FROM ANIMAL_OUTS
+            limit 24),
+
+A as (SELECT HOUR(DATETIME) as HOUR, count(*) as COUNT
+        FROM ANIMAL_OUTS
+        GROUP BY HOUR)
+
+SELECT H.HOUR, IFNULL(A.COUNT, 0) as COUNT FROM H
+LEFT JOIN A on H.HOUR = A.HOUR
+
+
+***다른 풀이
+
+SET @hour = -1;
+SELECT
+    (@hour := @hour +1) as HOUR,
+    (SELECT COUNT(*) FROM ANIMAL_OUTS WHERE HOUR(`datetime`) = @hour) AS `COUNT`
+FROM
+  ANIMAL_OUTS 
+WHERE
+  @hour < 23
+
+
+
+set @rownum = -1;
+select (@rownum := @rownum + 1) as HOUR,
+        (select count(*) from ANIMAL_OUTS where @rownum=HOUR(DATETIME)) as COUNT
+from ANIMAL_OUTS
+limit 24;
